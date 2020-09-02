@@ -16,6 +16,7 @@
     <modules>
         <module>spring-shop-basics-eureka-service</module>
         <module>spring-shop-basic-zuul-server</module>
+        <module>spring-shop-basic-upload-server</module>
     </modules>
 
 

@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="spring-shop-basics-eureka-service" />
         <module name="spring-shop-common-core" />
+        <module name="spring-shop-basic-upload-server" />
         <module name="spring-shop-service-api-xxx" />
         <module name="spring-shop-service-xxx" />
         <module name="spring-shop-basic-zuul-server" />
@@ -19,6 +20,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="spring-shop-basic-upload-server" options="-parameters" />
       <module name="spring-shop-basic-zuul-server" options="-parameters" />
       <module name="spring-shop-basics" options="-parameters" />
       <module name="spring-shop-basics-eureka-service" options="-parameters" />
