@@ -10,4 +10,7 @@ public interface CategoryMapper extends Mapper<CategoryEntity> {
 
     @Select(value = "select c.id,c.name from tb_category c where c.id in (select cb.category_id from tb_category_brand cb where cb.brand_id=#{brandId})")
     List<CategoryEntity> getBybrandId(Integer brandId);
+
+//    @Select(value = "select cb.brand_id  from tb_category c,tb_category_brand cb where c.id = cb.category_id and c.id =#{id}")
+//    List<CategoryEntity> getCategoryBybrandId(Integer id);
 }

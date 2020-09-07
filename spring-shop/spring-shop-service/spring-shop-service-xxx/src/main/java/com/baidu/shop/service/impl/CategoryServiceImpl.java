@@ -1,5 +1,8 @@
 package com.baidu.shop.service.impl;
 
+import com.baidu.shop.entity.CategoryBrandEntity;
+import com.baidu.shop.entity.SpecGroupEntity;
+import com.baidu.shop.entity.SpecParamEntity;
 import com.baidu.shop.mapper.CategoryBrandMapper;
 import com.baidu.shop.mapper.CategoryMapper;
 import com.baidu.shop.base.BaseApiService;
@@ -26,6 +29,9 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
 
     @Resource
     private CategoryMapper categoryMapper;
+
+    @Resource
+    private CategoryBrandMapper categoryBrandMapper;
 
 
     @Override
@@ -55,21 +61,30 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
             return this.setResultError("当前id不存在");
         }
 
-        if (categoryEntity.getIsParent() == 1){
+        if (categoryEntity.getIsParent() == 1) {
             return this.setResultError("当前节点为父节点,不能删除");
         }
-        Example example = new Example(CategoryEntity.class);
-        example.createCriteria().andEqualTo("parentId",categoryEntity.getParentId());
-        List<CategoryEntity> list = categoryMapper.selectByExample(example);
-        if (list.size() == 1){
+        List<CategoryBrandEntity> brandList = categoryBrandMapper.getCategoryByBrand(id);
+        if (brandList.size() > 0) return this.setResultError("该分类信息被品牌绑定不能被删除!!");
 
+        List<SpecGroupEntity> groupList = categoryBrandMapper.getCategoryByGroup(id);
+        if (groupList.size() > 0) return this.setResultError("该分类信息绑定规格不能被删除!!");
+
+
+        Example example = new Example(CategoryEntity.class);
+        example.createCriteria().andEqualTo("parentId", categoryEntity.getParentId());
+        //List<CategoryEntity> list = categoryMapper.selectByExample(example);
+        Integer count = categoryMapper.selectCountByExample(example);
+
+        if (count == 1) {
             CategoryEntity categoryEntity1 = new CategoryEntity();
             categoryEntity1.setId(categoryEntity.getParentId());
             categoryEntity1.setIsParent(0);
             categoryMapper.updateByPrimaryKeySelective(categoryEntity1);
-        }
-        categoryMapper.deleteByPrimaryKey(id);
 
+        }
+
+        categoryMapper.deleteByPrimaryKey(id);
         return this.setResultSuccess();
 
     }

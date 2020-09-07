@@ -1,6 +1,6 @@
 package com.baidu.shop.service.impl;
 
-import com.baidu.shop.BrandDTO;
+import com.baidu.shop.dto.BrandDTO;
 import com.baidu.shop.base.BaseApiService;
 import com.baidu.shop.base.Result;
 import com.baidu.shop.entity.BrandEntity;
@@ -20,7 +20,6 @@ import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -65,8 +64,8 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
     @Override
     public Result<JsonObject> saveBrand(BrandDTO brandDTO) {
 
-        BrandEntity brandEntity = BaiduBeanUtil.copyProperties(brandDTO, BrandEntity.class);
         //获取到品牌名称/获取到品牌名称第一个字符/将第一个字符转换为pinyin/获取拼音的首字母/统一转为大写
+        BrandEntity brandEntity = BaiduBeanUtil.copyProperties(brandDTO, BrandEntity.class);
         brandEntity.setLetter(PinyinUtil.getUpperCase(String.valueOf(brandEntity.getName().charAt(0)),
                 PinyinUtil.TO_FIRST_CHAR_PINYIN).charAt(0));
 
@@ -79,6 +78,7 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
         brandMapper.insertSelective(brandEntity);
 
         this.insertCategoryBrand(brandDTO, brandEntity);
+
         return this.setResultSuccess();
 
     }
