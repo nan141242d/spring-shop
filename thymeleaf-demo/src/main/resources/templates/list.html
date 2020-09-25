@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"   >
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<ul>
+    <li>编码--密码--年龄</li>
+    <li th:each="list : ${stuList}">
+        <span th:text="${list.code}"></span>--
+        <span th:text="${list.pass}"></span>--
+        <span th:text="${list.age}"></span>
+
+    </li>
+</ul>
+
+<ul>
+    <li>编码--密码--年龄--资历</li>
+    <li th:each="list,stat : ${stuList}">
+        <span th:text="${stat.index}"></span>
+        <span th:text="${list.code}"></span>--
+        <span th:text="${list.pass}"></span>--
+        <span th:if="${list.age>60}"> 可以退休</span>
+        <span th:unless="${list.age>60}"> 不可以退休</span>
+        <span th:switch="${list.code}">
+          <span th:case="'001'">1号员工，骨灰级</span>
+          <span th:case="'002'">2号员工，元老级</span>
+          <span th:case="'003'">3号员工，老员工</span>
+          <span th:case="'004'">4号员工，新员工</span>
+            <span th:case="*">临时员工</span>
+</span>
+
+    </li>
+</ul>
+<script th:inline="javascript">
+    const stuList =/*[[${stuList}]]*/;
+    const stu =/*[[${stuList[0]}]]*/;
+    const age =/*[[${stuList[0].age}]]*/;
+
+    console.log("集合"+stuList);
+    console.log("对象"+stu);
+    console.log("属性"+age);
+    stuList.forEach(stu =>{
+        console.log(stu.code +"  "+stu.pass);
+    })
+
+</script>
+
+
+
+</body>
+</html>

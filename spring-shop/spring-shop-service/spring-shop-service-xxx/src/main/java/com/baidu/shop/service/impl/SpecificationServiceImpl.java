@@ -46,14 +46,6 @@ public class SpecificationServiceImpl extends BaseApiService implements Specific
 
         List<SpecGroupEntity> list = specGroupMapper.selectByExample(example);
         return this.setResultSuccess(list);
-
-//        Example example = new Example(SpecGroupEntity.class);
-//
-//        if(ObjectUtil.isNotNull(specGroupDTO.getCid())) example.createCriteria().andEqualTo("cid",specGroupDTO.getCid());
-//
-//        List<SpecGroupEntity> list = specGroupMapper.selectByExample(example);
-//
-//        return this.setResultSuccess(list);
     }
 
     @Override
@@ -74,32 +66,33 @@ public class SpecificationServiceImpl extends BaseApiService implements Specific
 
     @Override
     public Result<JSONObject> delete(Integer id) {
-
-        /*List<CategoryEntity> bycId = specGroupMapper.getBycId(id);
-        if (bycId.size() == 0){
-            specGroupMapper.deleteByPrimaryKey(id);
-            return this.setResultSuccess();
-        }*/
         Example example = new Example(SpecParamEntity.class);
         example.createCriteria().andEqualTo("groupId", id);
+
         List<SpecParamEntity> list = paramMapper.selectByExample(example);
-        //if(list.size() == 0 ){  specGroupMapper.deleteByPrimaryKey(id); return this.setResultSuccess();}
         if (list.size() > 0) return this.setResultError("规则组包含参数不能删除");
 
         specGroupMapper.deleteByPrimaryKey(id);
         return this.setResultSuccess();
     }
 
-
     @Override
     public Result<List<SpecParamEntity>> getParam(SpecParamDTO specParamDTO) {
-        if (ObjectUtil.isNull(specParamDTO.getGroupId())) return this.setResultError("规格组id不能为空");
 
         Example example = new Example(SpecParamEntity.class);
-        example.createCriteria().andEqualTo("groupId", specParamDTO.getGroupId());
+        Example.Criteria criteria = example.createCriteria();
+
+        if (ObjectUtil.isNotNull(specParamDTO.getGroupId()))
+            criteria.andEqualTo("groupId", specParamDTO.getGroupId());
+        if (ObjectUtil.isNotNull(specParamDTO.getCid()))
+            criteria.andEqualTo("cid", specParamDTO.getCid());
+        if (ObjectUtil.isNotNull(specParamDTO.getSearching()))
+            criteria.andEqualTo("searching", specParamDTO.getSearching());
+        if (ObjectUtil.isNotNull(specParamDTO.getGeneric())) {
+            criteria.andEqualTo("generic", specParamDTO.getGeneric());
+        }
 
         List<SpecParamEntity> list = paramMapper.selectByExample(example);
-
 
         return this.setResultSuccess(list);
     }

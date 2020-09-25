@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en"   xmlns:th="http://www.thymeleaf.org"   >
+<head>
+    <meta charset="UTF-8">
+    <title>测试thymeleaf</title>
+</head>
+<body>
+你好，<span th:text="${name}"></span>
+
+hello<span th:text="${stu.code}"/></span><br>
+密码：<span data-th-text="${stu.pass}"></span><br>
+年龄：<span th:text="${stu['age']}"/></span><br>
+颜色：<span th:utext="${stu.LikeColor}"/></span><br>
+
+<div th:object="${stu}">
+    <span th:text="*{code}"></span><br>
+    <span th:text="*{pass}"></span><br>
+    <span th:text="*{age}"></span><br>
+    <span th:text="*{LikeColor}"></span><br>
+</div>
+
+<span th:text="${stu.code.substring(2)}"></span><br>
+<span th:text="${stu.code.split('')[1]}"></span><br>
+
+<span th:text="'88888'"></span><br>
+<span th:text="123*3"></span><br>
+<span th:if="${stu.age} >= 18">
+    成年人
+</span><br>
+
+<span th:text="'123'+${stu.code}+'321'"></span><br>
+<span th:text="|123${stu.code}321|"></span><br>
+<span th:text="${stu.code}?: ''"></span><br>
+
+
+<span th:switch="${stu.code}">
+    <span th:case="'001'">1号员工，骨灰级</span>
+  <span th:case="'002'">2号员工，元老级</span>
+  <span th:case="'003'">3号员工，老员工</span>
+  <span th:case="'004'">4号员工，新员工</span>
+    <span th:case="*">临时员工</span>
+
+</span>
+
+
+</body>
+
+
+</html>

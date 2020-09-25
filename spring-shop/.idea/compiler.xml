@@ -2,15 +2,20 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="spring-shop-basics-eureka-service" />
         <module name="spring-shop-common-core" />
         <module name="spring-shop-basic-upload-server" />
         <module name="spring-shop-service-api-xxx" />
         <module name="spring-shop-service-xxx" />
+        <module name="spring-shop-service-search" />
+        <module name="spring-shop-basics-eureka-service" />
+        <module name="spring-shop-service-api-template" />
+        <module name="spring-shop-service-api-search" />
+        <module name="sping-shop-service-template" />
         <module name="spring-shop-basic-zuul-server" />
       </profile>
     </annotationProcessing>
@@ -20,6 +25,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="sping-shop-service-template" options="-parameters" />
       <module name="spring-shop-basic-upload-server" options="-parameters" />
       <module name="spring-shop-basic-zuul-server" options="-parameters" />
       <module name="spring-shop-basics" options="-parameters" />
@@ -29,7 +35,10 @@
       <module name="spring-shop-commons-core" options="-parameters" />
       <module name="spring-shop-service" options="-parameters" />
       <module name="spring-shop-service-api" options="-parameters" />
+      <module name="spring-shop-service-api-search" options="-parameters" />
+      <module name="spring-shop-service-api-template" options="-parameters" />
       <module name="spring-shop-service-api-xxx" options="-parameters" />
+      <module name="spring-shop-service-search" options="-parameters" />
       <module name="spring-shop-service-xxx" options="-parameters" />
     </option>
   </component>

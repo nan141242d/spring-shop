@@ -14,6 +14,8 @@
     <packaging>pom</packaging>
     <modules>
         <module>spring-shop-service-xxx</module>
+        <module>spring-shop-service-search</module>
+        <module>sping-shop-service-template</module>
     </modules>
 
     <dependencies>

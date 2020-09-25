@@ -5,8 +5,11 @@ import com.baidu.shop.base.BaseApiService;
 import com.baidu.shop.base.Result;
 import com.baidu.shop.entity.BrandEntity;
 import com.baidu.shop.entity.CategoryBrandEntity;
+import com.baidu.shop.entity.CategoryEntity;
+import com.baidu.shop.entity.SpuEntity;
 import com.baidu.shop.mapper.BrandMapper;
 import com.baidu.shop.mapper.CategoryBrandMapper;
+import com.baidu.shop.mapper.SpuMapper;
 import com.baidu.shop.service.BrandService;
 import com.baidu.shop.utils.BaiduBeanUtil;
 import com.baidu.shop.utils.PinyinUtil;
@@ -39,8 +42,26 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
     @Resource
     private CategoryBrandMapper categoryBrandMapper;
 
+    @Resource
+    private SpuMapper spuMapper;
+
     @Override
-    public Result<List<BrandEntity>> getList(BrandDTO brandDTO) {
+    public Result<List<BrandEntity>> getBeandbyIdList(String brandsStr) {
+        List<Integer> bList = Arrays.asList(brandsStr.split(",")).stream().map(bStr -> Integer.parseInt(bStr))
+                .collect(Collectors.toList());
+        List<BrandEntity> list = brandMapper.selectByIdList(bList);
+
+        return this.setResultSuccess(list);
+    }
+
+    @Override
+    public Result<PageInfo<BrandEntity>> getBrandByCate(Integer cid) {
+        List<BrandEntity> list = brandMapper.getBrandByCateId(cid);
+        return this.setResultSuccess(list);
+    }
+
+    @Override
+    public Result<PageInfo<BrandEntity>> getList(BrandDTO brandDTO) {
 
         PageHelper.startPage(brandDTO.getPage(), brandDTO.getRows());
 
@@ -131,8 +152,16 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
 
     @Override
     public Result<JsonObject> deleteBrand(Integer id) {
-        brandMapper.deleteByPrimaryKey(id);
-        this.deleteCategoryBrand(id);
+
+        Example example = new Example(SpuEntity.class);
+        example.createCriteria().andEqualTo("brandId", id);
+        List<SpuEntity> list = spuMapper.selectByExample(example);
+        if (list.size() == 0) {
+            brandMapper.deleteByPrimaryKey(id);
+            this.deleteCategoryBrand(id);
+        } else {
+            return this.setResultError("品牌被商品绑定不能被删除");
+        }
 
         return this.setResultSuccess();
     }

@@ -3,12 +3,12 @@ package com.baidu.shop.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.baidu.shop.base.BaseApiService;
 import com.baidu.shop.base.Result;
-import com.baidu.shop.dto.BrandDTO;
+
 import com.baidu.shop.dto.SkuDTO;
 import com.baidu.shop.dto.SpuDTO;
 import com.baidu.shop.entity.*;
 import com.baidu.shop.mapper.*;
-import com.baidu.shop.service.BrandService;
+
 import com.baidu.shop.service.GoodsService;
 import com.baidu.shop.status.HTTPStatus;
 import com.baidu.shop.utils.BaiduBeanUtil;
@@ -57,6 +57,20 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
 
     @Transactional
     @Override
+    public Result<JSONObject> updateSaleable(SpuDTO spuDTO) {
+        SpuEntity spuEntity = BaiduBeanUtil.copyProperties(spuDTO, SpuEntity.class);
+        spuEntity.setId(spuDTO.getId());
+        if (spuDTO.getSaleable() == 1) {
+            spuEntity.setSaleable(0);
+        } else {
+            spuEntity.setSaleable(1);
+        }
+        spuMapper.updateByPrimaryKeySelective(spuEntity);
+        return this.setResultSuccess();
+    }
+
+    @Transactional
+    @Override
     public Result<JSONObject> edit(SpuDTO spuDTO) {
         System.out.println(spuDTO);
         //修改spu
@@ -69,15 +83,10 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
         spuDetailMapper.updateByPrimaryKeySelective(BaiduBeanUtil.copyProperties(spuDTO.getSpuDetail(), SpuDetailEntity.class));
 
         //查询skuIdlist
-        Example example = new Example(SkuEntity.class);
-        example.createCriteria().andEqualTo("spuId", spuDTO.getId());
-        List<SkuEntity> skuEntities = skuMapper.selectByExample(example);
-        List<Long> skuIdList = skuEntities.stream().map(sku -> sku.getId()).collect(Collectors.toList());
-
         //修改sku
-        skuMapper.deleteByIdList(skuIdList);
         //修改stock
-        stockMapper.deleteByIdList(skuIdList);
+        this.delSkuAndStock(spuDTO.getId());
+
         //新增sku stock
         this.addSkuAndStock(spuDTO.getSkus(), spuDTO.getId(), date);
 
@@ -123,10 +132,10 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     }
 
     @Override
-    public Result<PageInfo<Object>> getSpuInfo(SpuDTO spuDTO) {
+    public Result<List<SpuDTO>> getSpuInfo(SpuDTO spuDTO) {
         //分页
-        if (ObjectUtil.isNotNull(spuDTO.getPage()) && ObjectUtil.isNotNull(spuDTO.getRows())) ;
-        PageHelper.startPage(spuDTO.getPage(), spuDTO.getRows());
+        if (ObjectUtil.isNotNull(spuDTO.getPage()) && ObjectUtil.isNotNull(spuDTO.getRows()))
+            PageHelper.startPage(spuDTO.getPage(), spuDTO.getRows());
 
         //构建条件查询
         Example example = new Example(SpuEntity.class);
@@ -139,8 +148,12 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
             //是否上架
             if (ObjectUtil.isNotNull(spuDTO.getSaleable()) && spuDTO.getSaleable() != 2)
                 criteria.andEqualTo("saleable", spuDTO.getSaleable());
+            if (ObjectUtil.isNotNull(spuDTO.getId())) {
+                criteria.andEqualTo("id", spuDTO.getId());
+            }
             if (ObjectUtil.isNotNull(spuDTO.getSort()))
                 example.setOrderByClause(spuDTO.getOrderByClauser());
+
         }
         //执行查询
         List<SpuEntity> list = spuMapper.selectByExample(example);
@@ -172,18 +185,9 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
         spuMapper.deleteByPrimaryKey(spuId);
         //删除spudetail
         spuDetailMapper.deleteByPrimaryKey(spuId);
+        //删除sku stock
+        this.delSkuAndStock(spuId);
 
-        Example example = new Example(SkuEntity.class);
-        example.createCriteria().andEqualTo("spuId", spuId);
-        List<SkuEntity> skuEntities = skuMapper.selectByExample(example);
-        List<Long> skuIdArr = skuEntities.stream().map(skuEntity -> skuEntity.getId()).collect(Collectors.toList());
-        if (skuIdArr.size() > 0) {
-
-            //删除skus
-            skuMapper.deleteByIdList(skuIdArr);
-            //删除stock
-            stockMapper.deleteByIdList(skuIdArr);
-        }
         return this.setResultSuccess();
     }
 
@@ -203,5 +207,19 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
             stockMapper.insertSelective(stockEntity);
 
         });
+    }
+
+    public void delSkuAndStock(Integer spuId) {
+        Example example = new Example(SkuEntity.class);
+        example.createCriteria().andEqualTo("spuId", spuId);
+        List<SkuEntity> skuEntities = skuMapper.selectByExample(example);
+        List<Long> skuIdArr = skuEntities.stream().map(skuEntity -> skuEntity.getId()).collect(Collectors.toList());
+        if (skuIdArr.size() > 0) {
+
+            //删除skus
+            skuMapper.deleteByIdList(skuIdArr);
+            //删除stock
+            stockMapper.deleteByIdList(skuIdArr);
+        }
     }
 }
