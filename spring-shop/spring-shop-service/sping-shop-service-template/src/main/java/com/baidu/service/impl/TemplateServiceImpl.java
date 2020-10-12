@@ -60,6 +60,17 @@ public class TemplateServiceImpl extends BaseApiService implements TemplateServi
 
 
     @Override
+    public Result<JSONObject> delHTMLBySpuId(Integer spuId) {
+        File file = new File(staticHTMLPath + File.separator + spuId + ".html");
+
+        if (!file.delete()) {
+            return this.setResultError("文件删除失败");
+        }
+
+        return this.setResultSuccess();
+    }
+
+    @Override
     public Result<JSONObject> createStaticHTMLTemplate(Integer spuId) {
 
         //现在可以创建上下文了

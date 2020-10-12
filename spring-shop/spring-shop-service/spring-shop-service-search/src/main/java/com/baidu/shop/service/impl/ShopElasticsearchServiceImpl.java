@@ -41,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -69,6 +70,25 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
     @Resource
     private BrandFeign brandFeign;
 
+
+    @Override
+    public Result<JSONObject> saveData(Integer spuId) {
+        SpuDTO spuDTO = new SpuDTO();
+        spuDTO.setId(spuId);
+        List<GoodsDoc> goodsDocs = this.esGoodsInfo(spuDTO);
+        elasticsearchRestTemplate.save(goodsDocs.get(0));
+
+        return this.setResultSuccess();
+    }
+
+    @Override
+    public Result<JSONObject> delData(Integer spuId) {
+        GoodsDoc goodsDoc = new GoodsDoc();
+        goodsDoc.setId(spuId.longValue());
+        elasticsearchRestTemplate.delete(goodsDoc);
+
+        return this.setResultSuccess();
+    }
 
     @Override
     public GoodsResponse search(String search, Integer page, String filterStr) {
@@ -229,7 +249,7 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
             log.info("映射索引成功");
         }
         //批量新增数据
-        List<GoodsDoc> goodsDocs = this.esGoodsInfo();
+        List<GoodsDoc> goodsDocs = this.esGoodsInfo(new SpuDTO());
         elasticsearchRestTemplate.save(goodsDocs);
 
         return this.setResultSuccess();
@@ -247,12 +267,11 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
     }
 
     //获取mysql数据
-    private List<GoodsDoc> esGoodsInfo() {
+    private List<GoodsDoc> esGoodsInfo(SpuDTO spuDTO) {
 
         //查询出来的数据是多个spu
         List<GoodsDoc> goodsDocs = new ArrayList<>();
 
-        SpuDTO spuDTO = new SpuDTO();
         Result<List<SpuDTO>> spuInfo = goodsFeign.getSpuInfo(spuDTO);
         if (spuInfo.getCode() == HTTPStatus.OK) {
 
